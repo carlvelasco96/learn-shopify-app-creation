@@ -45,8 +45,6 @@ export default function App() {
 function MyProvider({ children }) {
   const app = useAppBridge();
 
-  // getSessionToken(app).then(token => console.log(`Fetching Session Token: ${token}`));
-
   const client = new ApolloClient({
     cache: new InMemoryCache(),
     link: new HttpLink({

@@ -3,6 +3,7 @@ import { gql, useQuery } from '@apollo/client';
 import { Page, Layout, Banner, Card } from "@shopify/polaris";
 import { Loading } from "@shopify/app-bridge-react";
 import ProductsList from "./ProductsList";
+import ApplyRandomPrices from './ApplyRandomPrices';
 
 const GET_PRODUCTS_BY_ID = gql`
   query getProducts($ids: [ID!]!) {
@@ -52,6 +53,7 @@ const ProductsPage = ({ productIds }) => {
           <Card>
             <ProductsList data={data} />
           </Card>
+          <ApplyRandomPrices selectedItems={data.nodes} onUpdate={refetch} />
         </Layout.Section>
       </Layout>
     </Page>
