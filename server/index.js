@@ -80,6 +80,27 @@ export async function createServer(
     }
   });
 
+  // EXAMPLE: Making a GraphQL query to the vendor's Shopify database
+  app.get("/fetch-products", verifyRequest(app), async (req, res) => {
+    const session = await Shopify.Utils.loadCurrentSession(req, res);
+    const client = new Shopify.Clients.Graphql(
+      session.shop,
+      session.accessToken
+    );
+    const queryString = `{
+      products (first: 3) {
+        edges {
+          node {
+            id
+            title
+          }
+        }
+      }
+    }`;
+    const response = await client.query({ data: queryString });
+    return res.status(200).send(response);
+  });
+
   app.use(express.json());
 
   app.use((req, res, next) => {

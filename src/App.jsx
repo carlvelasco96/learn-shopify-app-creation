@@ -9,7 +9,7 @@ import {
   Provider as AppBridgeProvider,
   useAppBridge,
 } from "@shopify/app-bridge-react";
-import { authenticatedFetch } from "@shopify/app-bridge-utils";
+import { authenticatedFetch, getSessionToken } from "@shopify/app-bridge-utils";
 import { Redirect } from "@shopify/app-bridge/actions";
 import { AppProvider as PolarisProvider } from "@shopify/polaris";
 import translations from "@shopify/polaris/locales/en.json";
@@ -17,6 +17,8 @@ import "@shopify/polaris/build/esm/styles.css";
 
 import EmptyStatePage from "./components/EmptyStatePage";
 import ProductsPage from "./components/ProductsPage";
+
+import axios from "axios";
 
 export default function App() {
   const [selection, setSelection] = useState([]);
@@ -45,6 +47,19 @@ export default function App() {
 function MyProvider({ children }) {
   const app = useAppBridge();
 
+  // EXAMPLE: Querying a backend that has verifyAccess Shopify middleware
+  const instance = axios.create();
+  // Intercept all requests on this Axios instance
+  instance.interceptors.request.use(function (config) {
+    return getSessionToken(app) // requires a Shopify App Bridge instance
+      .then((token) => {
+        // Append your request headers with an authenticated token
+        config.headers["Authorization"] = `Bearer ${token}`;
+        return config;
+      });
+  });
+  instance.get("/fetch-products").then(data => console.log(data)).catch(error => console.log(error));
+
   const client = new ApolloClient({
     cache: new InMemoryCache(),
     link: new HttpLink({
@@ -58,6 +73,8 @@ function MyProvider({ children }) {
 
 export function userLoggedInFetch(app) {
   const fetchFunction = authenticatedFetch(app);
+
+
 
   return async (uri, options) => {
     const response = await fetchFunction(uri, options);
