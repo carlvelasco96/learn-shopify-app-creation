@@ -20,6 +20,7 @@ import EmptyStatePage from "./components/EmptyStatePage";
 import ProductsPage from "./components/ProductsPage";
 
 import axios from "axios";
+import Test from "./components/Test";
 
 export default function App() {
   const [selection, setSelection] = useState([]);
@@ -34,6 +35,7 @@ export default function App() {
         }}
       >
         <MyProvider>
+          <Test />
           {selection.length > 0 ? (
 	          <ProductsPage productIds={selection} />
           ) : (

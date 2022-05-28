@@ -8,6 +8,8 @@ import "dotenv/config";
 import applyAuthMiddleware from "./middleware/auth.js";
 import verifyRequest from "./middleware/verify-request.js";
 
+import axios from "axios";
+
 const USE_ONLINE_TOKENS = true;
 const TOP_LEVEL_OAUTH_COOKIE = "shopify_top_level_oauth";
 
@@ -78,6 +80,21 @@ export async function createServer(
     } catch (error) {
       res.status(500).send(error.message);
     }
+  });
+
+  app.get("/test", async (req, res) => {
+    console.log("Shopify Backend Reached");
+    const session = await Shopify.Utils.loadCurrentSession(req, res);
+    let data;
+    try {
+      data = (await axios.post("http://localhost:3000/shopify", session))[
+        "data"
+      ];
+    } catch (error) {
+      console.log(error);
+    }
+    console.log(data);
+    return res.status(200).send("Sending Data to Shopify Frontend");
   });
 
   // EXAMPLE: Making a GraphQL query to the vendor's Shopify database
